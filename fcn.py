@@ -61,6 +61,7 @@ class FCN_64_11(nn.Module):
         )
 
         self.out_conv = nn.Conv2d(1024, 1, kernel_size=1)
+        self.out = nn.Sigmoid()
 
     def forward(self, x):
         # expected input shape: (64, 64)
@@ -70,6 +71,7 @@ class FCN_64_11(nn.Module):
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.out_conv(x)
+        x = self.out(x)
         return x
     
 
@@ -130,6 +132,7 @@ class FCN_112_11(nn.Module):
         )
 
         self.out_conv = nn.Conv2d(1024, 1, kernel_size=1)
+        self.out = nn.Sigmoid()
 
     def forward(self, x):
         # expected input shape: (64, 64)
@@ -139,6 +142,7 @@ class FCN_112_11(nn.Module):
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.out_conv(x)
+        x = self.out(x)
         return x
     
 
@@ -206,6 +210,7 @@ class FCN_224_11(nn.Module):
         )
 
         self.out_conv = nn.Conv2d(1024, 1, kernel_size=1)
+        self.out = nn.Sigmoid()
 
     def forward(self, x):
         # expected input shape: (64, 64)
@@ -215,5 +220,72 @@ class FCN_224_11(nn.Module):
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.conv5(x)
+        x = self.out_conv(x)
+        x = self.out(x)
+        return x
+    
+    
+class FCN_224_11_mini(nn.Module):
+    def __init__(self, in_channels,):
+        super(FCN_224_11_mini, self).__init__()
+    
+        # relu = nn.ReLU(inplace=True)
+        relu = nn.LeakyReLU(0.1, inplace=True)
+        
+        # (224, 224) => (112, 112)
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels, 64, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            relu,
+        )
+
+        # (112, 112) => (56, 56)
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=1),
+            nn.BatchNorm2d(64),
+            relu,
+            nn.Conv2d(64, 64, kernel_size=1),
+            nn.BatchNorm2d(64),
+            relu,
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(128),
+            relu,
+        )
+
+        # (56, 56) => (26, 26)
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(128, 128, kernel_size=1),
+            nn.BatchNorm2d(128),
+            relu,
+            nn.Conv2d(128, 128, kernel_size=1),
+            nn.BatchNorm2d(128),
+            relu,
+            nn.Conv2d(128, 256, kernel_size=5, stride=2),
+            nn.BatchNorm2d(256),
+            relu,
+        )
+
+        # (26, 26) => (11, 11)
+        self.conv4 = nn.Sequential(
+            nn.Conv2d(256, 256, kernel_size=1),
+            nn.BatchNorm2d(256),
+            relu,
+            nn.Conv2d(256, 256, kernel_size=1),
+            nn.BatchNorm2d(256),
+            relu,
+            nn.Conv2d(256, 512, kernel_size=5, stride=2),
+            nn.BatchNorm2d(512),
+            relu,
+        )
+        
+        self.out_conv = nn.Conv2d(512, 1, kernel_size=1)
+
+    def forward(self, x):
+        # expected input shape: (64, 64)
+        # expected output shape: (11, 11)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
         x = self.out_conv(x)
         return x
