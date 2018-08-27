@@ -16,3 +16,17 @@ Preprocess UCSD dataset.
 python prepocess_UCSD.py
 ```
 
+
+## Training
+
+Run `train.py`.
+
+- example
+```
+CUDA_VISIBLE_DEVICES=0 python train.py --dataset IR-MNIST
+
+```
+
+## Test
+
+See `example_UCSD.ipynb`
